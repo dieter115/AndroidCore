@@ -15,27 +15,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-abstract class BaseRestClient<T> {
+abstract class BaseRestClient {
     companion object {
         const val TAG = "BaseRestClient"
     }
-    protected abstract val apiService: Class<T>
 
     protected abstract val protectedClient: Boolean
 
     protected abstract fun getBaseUrl(): String
-
-    val getService: T by lazy {
-        Log.d(TAG, "getService()")
-        getRetrofit.create(apiService)
-    }
 
     val getHttpClient: OkHttpClient by lazy {
         Log.d(TAG, "getHttpClient")
         createHttpClient()
     }
 
-    private val getRetrofit: Retrofit by lazy {
+    protected val getRetrofit: Retrofit.Builder by lazy {
         Log.d(TAG, "getRetrofit")
         createRetrofit()
     }
@@ -56,14 +50,12 @@ abstract class BaseRestClient<T> {
             ).build()
     }
 
-    protected open fun createRetrofit(): Retrofit {
+    protected open fun createRetrofit(): Retrofit.Builder {
         Log.d(TAG, "createRetrofit")
         return Retrofit.Builder()
-            .baseUrl(getBaseUrl())
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(getFactory())
             .client(getHttpClient)
-            .build()
     }
 
     protected fun getFactory(): GsonConverterFactory {
